@@ -75,7 +75,7 @@ Operations:
 - LOAD
 - DELETE
 
-Valid categories (use ONLY these values):
+Valid categories:
 - profile
 - preference
 - fact
@@ -171,6 +171,29 @@ CREATE_DIRECTORY
 }
 
 ==================================================
+CLIPBOARD
+==================================================
+
+Operations:
+- COPY
+- READ
+- CLEAR
+
+COPY
+
+{
+    "text": "<text>"
+}
+
+READ
+
+{}
+
+CLEAR
+
+{}
+
+==================================================
 NEWS
 ==================================================
 
@@ -210,9 +233,9 @@ RULES
   INSTALLATION
   MEMORY
   FILESYSTEM
+  CLIPBOARD
   NEWS
   SYSTEM
-- Operation names must exactly match the supported operations.
 """
 
 

@@ -16,6 +16,7 @@ from core.router import Router
 from enums.handler_type import HandlerType
 
 from handlers.application_handler import ApplicationHandler
+from handlers.clipboard_handler import ClipboardHandler
 from handlers.filesystem_handler import FilesystemHandler
 from handlers.installation_handler import InstallationHandler
 from handlers.memory_handler import MemoryHandler
@@ -28,6 +29,9 @@ from infrastructure.ai.openai_provider import OpenAIProvider
 from infrastructure.applications.application_resolver import ApplicationResolver
 from infrastructure.applications.windows_application_service import (
     WindowsApplicationService,
+)
+from infrastructure.clipboard.windows_clipboard_service import (
+    WindowsClipboardService,
 )
 from infrastructure.database.sqlite_database import SQLiteDatabase
 from infrastructure.filesystem.windows_filesystem_service import (
@@ -99,6 +103,8 @@ class ServiceContainer:
 
         self.filesystem_service = WindowsFilesystemService()
 
+        self.clipboard_service = WindowsClipboardService()
+
         self.profile_service = JsonProfileService()
 
         self.system_service = WindowsSystemService(
@@ -161,6 +167,10 @@ class ServiceContainer:
             self.filesystem_service,
         )
 
+        self.clipboard_handler = ClipboardHandler(
+            self.clipboard_service,
+        )
+
         self.news_handler = NewsHandler(
             self.news_service,
         )
@@ -193,6 +203,11 @@ class ServiceContainer:
         self.handler_registry.register(
             HandlerType.FILESYSTEM,
             self.filesystem_handler,
+        )
+
+        self.handler_registry.register(
+            HandlerType.CLIPBOARD,
+            self.clipboard_handler,
         )
 
         self.handler_registry.register(

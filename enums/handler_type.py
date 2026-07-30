@@ -15,3 +15,4 @@ class HandlerType(str, Enum):
     NEWS = "news"
     INSTALLATION = "installation"
     FILESYSTEM = "filesystem"
+    CLIPBOARD = "clipboard"

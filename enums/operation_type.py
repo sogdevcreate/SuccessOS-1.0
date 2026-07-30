@@ -33,6 +33,9 @@ class OperationType(str, Enum):
     MOVE = "move"
     CREATE_DIRECTORY = "create_directory"
 
+    # Clipboard
+    CLEAR = "clear"
+
     # System
     SHUTDOWN = "shutdown"
     RESTART = "restart"

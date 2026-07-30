@@ -87,6 +87,15 @@ class PlanValidator:
         ),
 
         #
+        # Clipboard
+        #
+        (HandlerType.CLIPBOARD, OperationType.COPY): (
+            "text",
+        ),
+        (HandlerType.CLIPBOARD, OperationType.READ): (),
+        (HandlerType.CLIPBOARD, OperationType.CLEAR): (),
+
+        #
         # News
         #
         (HandlerType.NEWS, OperationType.SEARCH): (
