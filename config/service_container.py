@@ -21,6 +21,7 @@ from handlers.filesystem_handler import FilesystemHandler
 from handlers.installation_handler import InstallationHandler
 from handlers.memory_handler import MemoryHandler
 from handlers.news_handler import NewsHandler
+from handlers.process_handler import ProcessHandler
 from handlers.system_handler import SystemHandler
 
 from infrastructure.ai.ai_planner import AIPlanner
@@ -47,6 +48,9 @@ from infrastructure.logging.python_logging_service import (
 )
 from infrastructure.memory.sqlite_memory_service import SQLiteMemoryService
 from infrastructure.news.web_news_service import WebNewsService
+from infrastructure.process.windows_process_service import (
+    WindowsProcessService,
+)
 from infrastructure.profiles.json_profile_service import JsonProfileService
 from infrastructure.system.windows_system_service import (
     WindowsSystemService,
@@ -104,6 +108,8 @@ class ServiceContainer:
         self.filesystem_service = WindowsFilesystemService()
 
         self.clipboard_service = WindowsClipboardService()
+
+        self.process_service = WindowsProcessService()
 
         self.profile_service = JsonProfileService()
 
@@ -171,6 +177,10 @@ class ServiceContainer:
             self.clipboard_service,
         )
 
+        self.process_handler = ProcessHandler(
+            self.process_service,
+        )
+
         self.news_handler = NewsHandler(
             self.news_service,
         )
@@ -208,6 +218,11 @@ class ServiceContainer:
         self.handler_registry.register(
             HandlerType.CLIPBOARD,
             self.clipboard_handler,
+        )
+
+        self.handler_registry.register(
+            HandlerType.PROCESS,
+            self.process_handler,
         )
 
         self.handler_registry.register(

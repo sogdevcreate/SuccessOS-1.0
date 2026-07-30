@@ -36,6 +36,12 @@ class OperationType(str, Enum):
     # Clipboard
     CLEAR = "clear"
 
+    # Process
+    LIST_PROCESSES = "list_processes"
+    START_PROCESS = "start_process"
+    KILL_PROCESS = "kill_process"
+    PROCESS_INFO = "process_info"
+
     # System
     SHUTDOWN = "shutdown"
     RESTART = "restart"

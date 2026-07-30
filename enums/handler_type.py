@@ -16,3 +16,4 @@ class HandlerType(str, Enum):
     INSTALLATION = "installation"
     FILESYSTEM = "filesystem"
     CLIPBOARD = "clipboard"
+    PROCESS = "process"

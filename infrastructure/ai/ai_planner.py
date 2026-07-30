@@ -194,6 +194,38 @@ CLEAR
 {}
 
 ==================================================
+PROCESS
+==================================================
+
+Operations:
+- LIST_PROCESSES
+- START_PROCESS
+- KILL_PROCESS
+- PROCESS_INFO
+
+LIST_PROCESSES
+
+{}
+
+START_PROCESS
+
+{
+    "command": "<command>"
+}
+
+KILL_PROCESS
+
+{
+    "process": "<process name>"
+}
+
+PROCESS_INFO
+
+{
+    "process": "<process name>"
+}
+
+==================================================
 NEWS
 ==================================================
 
@@ -234,6 +266,7 @@ RULES
   MEMORY
   FILESYSTEM
   CLIPBOARD
+  PROCESS
   NEWS
   SYSTEM
 """

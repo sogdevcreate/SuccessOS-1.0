@@ -96,6 +96,20 @@ class PlanValidator:
         (HandlerType.CLIPBOARD, OperationType.CLEAR): (),
 
         #
+        # Process
+        #
+        (HandlerType.PROCESS, OperationType.LIST_PROCESSES): (),
+        (HandlerType.PROCESS, OperationType.START_PROCESS): (
+            "command",
+        ),
+        (HandlerType.PROCESS, OperationType.KILL_PROCESS): (
+            "process",
+        ),
+        (HandlerType.PROCESS, OperationType.PROCESS_INFO): (
+            "process",
+        ),
+
+        #
         # News
         #
         (HandlerType.NEWS, OperationType.SEARCH): (
