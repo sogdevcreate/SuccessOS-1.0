@@ -109,7 +109,13 @@ class ServiceContainer:
             logger=self.logging_service,
         )
 
-        self.filesystem_service = WindowsFilesystemService()
+        self.filesystem_service = WindowsFilesystemService(
+            allowed_roots=self.settings.get(
+                "filesystem",
+                "allowed_roots",
+                default=["."],
+            ),
+        )
 
         self.clipboard_service = WindowsClipboardService()
 

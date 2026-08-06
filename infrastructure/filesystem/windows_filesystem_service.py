@@ -7,8 +7,12 @@ Windows implementation of the FilesystemService contract.
 from __future__ import annotations
 
 import shutil
+from collections.abc import Iterable
 from pathlib import Path
 
+from infrastructure.filesystem.filesystem_sandbox import (
+    FilesystemSandbox,
+)
 from services.filesystem_service import FilesystemService
 
 
@@ -17,17 +21,26 @@ class WindowsFilesystemService(FilesystemService):
     Windows implementation of filesystem operations.
     """
 
+    def __init__(
+        self,
+        allowed_roots: Iterable[str | Path] | None = None,
+    ) -> None:
+        if allowed_roots is None:
+            allowed_roots = (Path.cwd(),)
+
+        self._sandbox = FilesystemSandbox(allowed_roots)
+
     def exists(
         self,
         path: Path,
     ) -> bool:
-        return path.exists()
+        return self._sandbox.resolve(path).exists()
 
     def read_text(
         self,
         path: Path,
     ) -> str:
-        return path.read_text(
+        return self._sandbox.resolve(path).read_text(
             encoding="utf-8",
         )
 
@@ -36,7 +49,7 @@ class WindowsFilesystemService(FilesystemService):
         path: Path,
         content: str,
     ) -> bool:
-        path.write_text(
+        self._sandbox.resolve(path).write_text(
             content,
             encoding="utf-8",
         )
@@ -46,13 +59,17 @@ class WindowsFilesystemService(FilesystemService):
         self,
         path: Path,
     ) -> list[Path]:
-        return sorted(path.iterdir())
+        directory = self._sandbox.resolve(path)
+        return sorted(
+            self._sandbox.resolve(item)
+            for item in directory.iterdir()
+        )
 
     def create_directory(
         self,
         path: Path,
     ) -> bool:
-        path.mkdir(
+        self._sandbox.resolve(path).mkdir(
             parents=True,
             exist_ok=True,
         )
@@ -62,10 +79,12 @@ class WindowsFilesystemService(FilesystemService):
         self,
         path: Path,
     ) -> bool:
-        if path.is_dir():
-            shutil.rmtree(path)
-        elif path.exists():
-            path.unlink()
+        target = self._sandbox.resolve(path)
+
+        if target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
 
         return True
 
@@ -74,16 +93,19 @@ class WindowsFilesystemService(FilesystemService):
         source: Path,
         destination: Path,
     ) -> bool:
-        if source.is_dir():
+        source_path = self._sandbox.resolve(source)
+        destination_path = self._sandbox.resolve(destination)
+
+        if source_path.is_dir():
             shutil.copytree(
-                source,
-                destination,
+                source_path,
+                destination_path,
                 dirs_exist_ok=True,
             )
         else:
             shutil.copy2(
-                source,
-                destination,
+                source_path,
+                destination_path,
             )
 
         return True
@@ -93,10 +115,10 @@ class WindowsFilesystemService(FilesystemService):
         source: Path,
         destination: Path,
     ) -> bool:
-        shutil.move(
-            str(source),
-            str(destination),
-        )
+        source_path = self._sandbox.resolve(source)
+        destination_path = self._sandbox.resolve(destination)
+
+        shutil.move(str(source_path), str(destination_path))
         return True
 
     def search(
@@ -104,4 +126,8 @@ class WindowsFilesystemService(FilesystemService):
         directory: Path,
         pattern: str,
     ) -> list[Path]:
-        return sorted(directory.rglob(pattern))
+        search_root = self._sandbox.resolve(directory)
+        return sorted(
+            self._sandbox.resolve(path)
+            for path in search_root.rglob(pattern)
+        )

@@ -24,6 +24,9 @@ class Settings:
         "memory": {
             "path": "data/memory.db",
         },
+        "filesystem": {
+            "allowed_roots": ["."],
+        },
         "news": {
             "provider": "newsapi",
             "api_key": "",
