@@ -27,6 +27,10 @@ class Settings:
         "filesystem": {
             "allowed_roots": ["."],
         },
+        "browser": {
+            "allowed_domains": ["youtube.com"],
+            "allowed_schemes": ["https"],
+        },
         "news": {
             "provider": "newsapi",
             "api_key": "",

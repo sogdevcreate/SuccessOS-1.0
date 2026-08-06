@@ -9,6 +9,9 @@ from __future__ import annotations
 from infrastructure.browser.browser_interaction import (
     BrowserInteraction,
 )
+from infrastructure.browser.browser_policy_manager import (
+    BrowserPolicyManager,
+)
 from infrastructure.browser.browser_session import BrowserSession
 from infrastructure.browser.browser_tab_manager import (
     BrowserTabManager,
@@ -27,7 +30,13 @@ class WindowsBrowserService(BrowserService):
     Windows implementation of browser automation.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        policy_manager: BrowserPolicyManager | None = None,
+    ) -> None:
+        self._policy = policy_manager or BrowserPolicyManager(
+            allowed_domains=("youtube.com",),
+        )
         self._session = BrowserSession()
 
         self._tabs = BrowserTabManager(
@@ -60,9 +69,7 @@ class WindowsBrowserService(BrowserService):
 
         driver = self._session.driver
 
-        driver.get(
-            url,
-        )
+        driver.get(self._policy.authorize_navigation(url))
 
         self._session.remember_current_tab()
 
@@ -80,9 +87,7 @@ class WindowsBrowserService(BrowserService):
             "tab",
         )
 
-        driver.get(
-            url,
-        )
+        driver.get(self._policy.authorize_navigation(url))
 
         self._session.remember_current_tab()
 
@@ -104,7 +109,9 @@ class WindowsBrowserService(BrowserService):
         Refresh the current page.
         """
 
-        self._session.driver.refresh()
+        driver = self._session.driver
+        self._policy.authorize_navigation(driver.current_url)
+        driver.refresh()
 
     def go_back(
         self,
@@ -192,6 +199,7 @@ class WindowsBrowserService(BrowserService):
         Type into an element.
         """
 
+        self._policy.authorize_form_submission((text,))
         self._interaction.type(
             selector,
             text,
@@ -258,6 +266,7 @@ class WindowsBrowserService(BrowserService):
         Upload a file.
         """
 
+        self._policy.authorize_upload(path)
         self._interaction.upload_file(
             selector,
             path,
@@ -287,6 +296,7 @@ class WindowsBrowserService(BrowserService):
         Search YouTube.
         """
 
+        self._policy.authorize_navigation("https://www.youtube.com/")
         self._youtube.search(
             query,
         )
@@ -301,6 +311,7 @@ class WindowsBrowserService(BrowserService):
         Play the first matching YouTube video.
         """
 
+        self._policy.authorize_navigation("https://www.youtube.com/")
         self._youtube.play(
             query,
         )
@@ -315,6 +326,7 @@ class WindowsBrowserService(BrowserService):
         Open a YouTube video.
         """
 
+        self._policy.authorize_navigation("https://www.youtube.com/")
         self._youtube.open_video(
             video_id,
         )
@@ -329,6 +341,7 @@ class WindowsBrowserService(BrowserService):
         Open a YouTube playlist.
         """
 
+        self._policy.authorize_navigation("https://www.youtube.com/")
         self._youtube.open_playlist(
             playlist_id,
         )
@@ -343,6 +356,7 @@ class WindowsBrowserService(BrowserService):
         Open a YouTube channel.
         """
 
+        self._policy.authorize_navigation("https://www.youtube.com/")
         self._youtube.open_channel(
             channel,
         )
@@ -354,26 +368,34 @@ class WindowsBrowserService(BrowserService):
     #
 
     def studio_open(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.open_studio()
 
     def studio_dashboard(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.dashboard()
 
     def studio_content(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.content()
 
     def studio_analytics(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.analytics()
 
     def studio_comments(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.comments()
 
     def studio_copyright(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.copyright()
 
     def studio_monetization(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.monetization()
 
     def studio_settings(self) -> None:
+        self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.settings()
 

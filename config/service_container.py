@@ -35,6 +35,9 @@ from infrastructure.applications.windows_application_service import (
 from infrastructure.browser.windows_browser_service import (
     WindowsBrowserService,
 )
+from infrastructure.browser.browser_policy_manager import (
+    BrowserPolicyManager,
+)
 from infrastructure.clipboard.windows_clipboard_service import (
     WindowsClipboardService,
 )
@@ -121,7 +124,22 @@ class ServiceContainer:
 
         self.process_service = WindowsProcessService()
 
-        self.browser_service = WindowsBrowserService()
+        self.browser_policy_manager = BrowserPolicyManager(
+            allowed_domains=self.settings.get(
+                "browser",
+                "allowed_domains",
+                default=["youtube.com"],
+            ),
+            allowed_schemes=self.settings.get(
+                "browser",
+                "allowed_schemes",
+                default=["https"],
+            ),
+        )
+
+        self.browser_service = WindowsBrowserService(
+            policy_manager=self.browser_policy_manager,
+        )
 
         self.profile_service = JsonProfileService()
 
