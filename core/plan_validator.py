@@ -110,6 +110,77 @@ class PlanValidator:
         ),
 
         #
+        # Browser
+        #
+        (HandlerType.BROWSER, OperationType.OPEN_URL): (
+            "url",
+        ),
+        (HandlerType.BROWSER, OperationType.OPEN_TAB): (
+            "url",
+        ),
+        (HandlerType.BROWSER, OperationType.CLOSE_TAB): (),
+        (HandlerType.BROWSER, OperationType.REFRESH_PAGE): (),
+        (HandlerType.BROWSER, OperationType.GO_BACK): (),
+        (HandlerType.BROWSER, OperationType.GO_FORWARD): (),
+        (HandlerType.BROWSER, OperationType.LIST_TABS): (),
+        (HandlerType.BROWSER, OperationType.CURRENT_TAB): (),
+        (HandlerType.BROWSER, OperationType.SWITCH_TAB): (
+            "index",
+        ),
+        (HandlerType.BROWSER, OperationType.PAGE_TITLE): (),
+        (HandlerType.BROWSER, OperationType.CLICK): (
+            "selector",
+        ),
+        (HandlerType.BROWSER, OperationType.TYPE): (
+            "selector",
+            "text",
+        ),
+        (HandlerType.BROWSER, OperationType.PRESS): (
+            "key",
+        ),
+        (HandlerType.BROWSER, OperationType.WAIT_FOR): (
+            "selector",
+        ),
+        (HandlerType.BROWSER, OperationType.SCROLL): (
+            "pixels",
+        ),
+        (HandlerType.BROWSER, OperationType.SELECT): (
+            "selector",
+            "value",
+        ),
+        (HandlerType.BROWSER, OperationType.UPLOAD_FILE): (
+            "selector",
+            "path",
+        ),
+        (HandlerType.BROWSER, OperationType.SCREENSHOT): (
+            "path",
+        ),
+        (HandlerType.BROWSER, OperationType.YOUTUBE_SEARCH): (
+            "query",
+        ),
+        (HandlerType.BROWSER, OperationType.YOUTUBE_PLAY): (
+            "query",
+        ),
+        (HandlerType.BROWSER, OperationType.YOUTUBE_VIDEO): (
+            "video_id",
+        ),
+        (HandlerType.BROWSER, OperationType.YOUTUBE_PLAYLIST): (
+            "playlist_id",
+        ),
+        (HandlerType.BROWSER, OperationType.YOUTUBE_CHANNEL): (
+            "channel",
+        ),
+
+        (HandlerType.BROWSER, OperationType.STUDIO_OPEN): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_DASHBOARD): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_CONTENT): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_ANALYTICS): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_COMMENTS): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_COPYRIGHT): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_MONETIZATION): (),
+        (HandlerType.BROWSER, OperationType.STUDIO_SETTINGS): (),
+
+        #
         # News
         #
         (HandlerType.NEWS, OperationType.SEARCH): (

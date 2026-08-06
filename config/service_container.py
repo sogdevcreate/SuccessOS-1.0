@@ -16,6 +16,7 @@ from core.router import Router
 from enums.handler_type import HandlerType
 
 from handlers.application_handler import ApplicationHandler
+from handlers.browser_handler import BrowserHandler
 from handlers.clipboard_handler import ClipboardHandler
 from handlers.filesystem_handler import FilesystemHandler
 from handlers.installation_handler import InstallationHandler
@@ -30,6 +31,9 @@ from infrastructure.ai.openai_provider import OpenAIProvider
 from infrastructure.applications.application_resolver import ApplicationResolver
 from infrastructure.applications.windows_application_service import (
     WindowsApplicationService,
+)
+from infrastructure.browser.windows_browser_service import (
+    WindowsBrowserService,
 )
 from infrastructure.clipboard.windows_clipboard_service import (
     WindowsClipboardService,
@@ -111,6 +115,8 @@ class ServiceContainer:
 
         self.process_service = WindowsProcessService()
 
+        self.browser_service = WindowsBrowserService()
+
         self.profile_service = JsonProfileService()
 
         self.system_service = WindowsSystemService(
@@ -181,6 +187,10 @@ class ServiceContainer:
             self.process_service,
         )
 
+        self.browser_handler = BrowserHandler(
+            self.browser_service,
+        )
+
         self.news_handler = NewsHandler(
             self.news_service,
         )
@@ -223,6 +233,11 @@ class ServiceContainer:
         self.handler_registry.register(
             HandlerType.PROCESS,
             self.process_handler,
+        )
+
+        self.handler_registry.register(
+            HandlerType.BROWSER,
+            self.browser_handler,
         )
 
         self.handler_registry.register(

@@ -1,3 +1,5 @@
 openai
 requests
 psutil
+selenium
+webdriver-manager

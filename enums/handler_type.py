@@ -17,3 +17,4 @@ class HandlerType(str, Enum):
     FILESYSTEM = "filesystem"
     CLIPBOARD = "clipboard"
     PROCESS = "process"
+    BROWSER = "browser"
