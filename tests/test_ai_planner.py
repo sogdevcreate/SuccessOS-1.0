@@ -29,6 +29,11 @@ class _FakeAIService:
         )
 
 
+class _FailingAIService:
+    def generate(self, request):
+        raise AssertionError("Exact browser commands must not call the AI service.")
+
+
 class AIPlannerTests(unittest.TestCase):
     def test_create_plan_preserves_action_order_and_parameters(self) -> None:
         service = _FakeAIService(
@@ -86,6 +91,36 @@ class AIPlannerTests(unittest.TestCase):
         ):
             with self.subTest(operation=operation):
                 self.assertIn(f'"operation": "{operation}"', EXAMPLES_PROMPT)
+
+    def test_exact_browser_commands_have_correct_regression_operations(self) -> None:
+        planner = AIPlanner(_FailingAIService())
+        cases = (
+            ("Open https://example.com", OperationType.OPEN_URL),
+            ("Open new tab https://example.com", OperationType.OPEN_TAB),
+            ("Click Search", OperationType.CLICK),
+            ("Type OpenAI into Search", OperationType.TYPE),
+            ("Press Enter", OperationType.PRESS),
+            ("Scroll down", OperationType.SCROLL),
+            ("Select Public", OperationType.SELECT),
+            ("Upload file C:\\work\\report.pdf", OperationType.UPLOAD_FILE),
+        )
+
+        for command, operation in cases:
+            with self.subTest(command=command):
+                plan = planner.create_plan(command)
+                self.assertEqual(len(plan.actions), 1)
+                self.assertEqual(plan.actions[0].handler, HandlerType.BROWSER)
+                self.assertEqual(plan.actions[0].operation, operation)
+
+    def test_type_command_preserves_text_and_selector(self) -> None:
+        plan = AIPlanner(_FailingAIService()).create_plan(
+            "Type OpenAI into Search"
+        )
+
+        self.assertEqual(
+            plan.actions[0].parameters,
+            {"selector": "Search", "text": "OpenAI"},
+        )
 
 
 if __name__ == "__main__":

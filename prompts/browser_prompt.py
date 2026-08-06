@@ -9,6 +9,16 @@ BROWSER_PROMPT = dedent(
     BROWSER
     ==================================================
 
+    Command intent mapping:
+    - "Open https://..." means OPEN_URL.
+    - "Open new tab https://..." means OPEN_TAB.
+    - "Click <element>" means CLICK.
+    - "Type <text> into <element>" means TYPE, even when <text> begins with "Open".
+    - "Press <key>" means PRESS.
+    - "Scroll down" means SCROLL.
+    - "Select <option>" means SELECT.
+    - "Upload file <path>" means UPLOAD_FILE.
+
     Operations:
     - OPEN_URL
     - OPEN_TAB

@@ -1,8 +1,4 @@
-"""
-AI Planner.
-
-Builds an execution plan using the AI service.
-"""
+"""Build execution plans using deterministic and AI-backed planning."""
 
 from __future__ import annotations
 
@@ -10,35 +6,37 @@ import json
 
 from enums.handler_type import HandlerType
 from enums.operation_type import OperationType
-
+from infrastructure.ai.browser_intent_classifier import (
+    BrowserIntentClassifier,
+)
 from models.action import Action
 from models.ai_request import AIRequest
 from models.execution_plan import ExecutionPlan
-
 from prompts.system_prompt import SYSTEM_PROMPT
-
 from services.ai_service import AIService
 from services.planner import Planner
 
 
 class AIPlanner(Planner):
-    """
-    AI implementation of the Planner contract.
-    """
+    """AI implementation of the Planner contract."""
 
     def __init__(
         self,
         ai_service: AIService,
     ) -> None:
         self._ai_service = ai_service
+        self._browser_intent_classifier = BrowserIntentClassifier()
 
     def create_plan(
         self,
         prompt: str,
     ) -> ExecutionPlan:
-        """
-        Create an execution plan from a natural language prompt.
-        """
+        """Create an execution plan from a natural language prompt."""
+
+        browser_plan = self._browser_intent_classifier.create_plan(prompt)
+
+        if browser_plan is not None:
+            return browser_plan
 
         response = self._ai_service.generate(
             AIRequest(
@@ -49,29 +47,16 @@ class AIPlanner(Planner):
             )
         )
 
-        data = json.loads(
-            response.content,
-        )
-
+        data = json.loads(response.content)
         plan = ExecutionPlan()
 
-        for item in data.get(
-            "actions",
-            [],
-        ):
+        for item in data.get("actions", []):
             plan.add(
                 Action(
                     name=item["operation"],
-                    handler=HandlerType[
-                        item["handler"]
-                    ],
-                    operation=OperationType[
-                        item["operation"]
-                    ],
-                    parameters=item.get(
-                        "parameters",
-                        {},
-                    ),
+                    handler=HandlerType[item["handler"]],
+                    operation=OperationType[item["operation"]],
+                    parameters=item.get("parameters", {}),
                 )
             )
 

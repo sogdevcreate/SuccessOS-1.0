@@ -12,7 +12,7 @@ EXAMPLES_PROMPT = dedent(
     User: Open https://www.youtube.com
     {"actions": [{"handler": "BROWSER", "operation": "OPEN_URL", "parameters": {"url": "https://www.youtube.com"}}]}
 
-    User: Open example.com in a new tab
+    User: Open new tab https://example.com
     {"actions": [{"handler": "BROWSER", "operation": "OPEN_TAB", "parameters": {"url": "https://example.com"}}]}
 
     User: Click the Sign in button
