@@ -4,6 +4,7 @@ Execution Engine.
 
 from __future__ import annotations
 
+from core.permission_manager import PermissionManager
 from core.router import Router
 from models.execution_plan import ExecutionPlan
 from models.execution_result import ExecutionResult
@@ -17,8 +18,12 @@ class ExecutionEngine:
     def __init__(
         self,
         router: Router,
+        permission_manager: PermissionManager | None = None,
     ) -> None:
         self._router = router
+        self._permission_manager = (
+            permission_manager or PermissionManager()
+        )
 
     def execute(
         self,
@@ -34,6 +39,21 @@ class ExecutionEngine:
         last_result: ExecutionResult | None = None
 
         for action in plan:
+
+            permission_result = self._permission_manager.authorize(
+                action,
+            )
+
+            if permission_result is not None:
+                return ExecutionResult(
+                    status=permission_result.status,
+                    message=permission_result.message,
+                    payload=permission_result.payload,
+                    completed_actions=completed,
+                    total_actions=total,
+                    errors=permission_result.errors,
+                    metadata=permission_result.metadata,
+                )
 
             result = self._router.route(action)
 
