@@ -62,9 +62,12 @@ class BrowserPolicyManager:
 
         if parts.scheme in {"http", "https"}:
             host = parts.hostname
-            if host is None or not self._is_allowed_domain(host):
+            if host is None:
+                raise BrowserPolicyError("HTTP(S) URLs must include a hostname.")
+
+            if self._allowed_domains and not self._is_allowed_domain(host):
                 raise BrowserPolicyError(
-                    f"Navigation to '{host or url}' is not allowed."
+                    f"Navigation to '{host}' is not allowed."
                 )
 
         return normalized

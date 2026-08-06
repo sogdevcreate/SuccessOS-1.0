@@ -128,7 +128,7 @@ class ServiceContainer:
             allowed_domains=self.settings.get(
                 "browser",
                 "allowed_domains",
-                default=["youtube.com"],
+                default=[],
             ),
             allowed_schemes=self.settings.get(
                 "browser",

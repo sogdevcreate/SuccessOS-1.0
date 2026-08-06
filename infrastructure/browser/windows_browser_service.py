@@ -34,9 +34,7 @@ class WindowsBrowserService(BrowserService):
         self,
         policy_manager: BrowserPolicyManager | None = None,
     ) -> None:
-        self._policy = policy_manager or BrowserPolicyManager(
-            allowed_domains=("youtube.com",),
-        )
+        self._policy = policy_manager or BrowserPolicyManager()
         self._session = BrowserSession()
 
         self._tabs = BrowserTabManager(

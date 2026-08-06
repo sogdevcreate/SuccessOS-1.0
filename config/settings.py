@@ -28,7 +28,7 @@ class Settings:
             "allowed_roots": ["."],
         },
         "browser": {
-            "allowed_domains": ["youtube.com"],
+            "allowed_domains": [],
             "allowed_schemes": ["https"],
         },
         "news": {

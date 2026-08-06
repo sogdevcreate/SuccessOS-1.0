@@ -23,6 +23,18 @@ class BrowserPolicyManagerTests(unittest.TestCase):
 
         self.assertEqual(url, "https://www.example.com/Path?x=1#section")
 
+    def test_default_policy_allows_any_https_domain(self) -> None:
+        manager = BrowserPolicyManager()
+
+        self.assertEqual(
+            manager.authorize_navigation("https://docs.example.test/path"),
+            "https://docs.example.test/path",
+        )
+        self.assertEqual(
+            manager.authorize_navigation("https://another-site.test"),
+            "https://another-site.test/",
+        )
+
     def test_allows_subdomains_but_not_domain_lookalikes(self) -> None:
         self.assertEqual(
             self.manager.authorize_navigation("https://api.example.com"),
