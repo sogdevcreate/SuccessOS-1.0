@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from enums.execution_status import ExecutionStatus
+from models.execution_trace_entry import ExecutionTraceEntry
 
 
 @dataclass(slots=True)
@@ -31,6 +32,8 @@ class ExecutionResult:
     errors: list[str] = field(default_factory=list)
 
     metadata: dict[str, Any] = field(default_factory=dict)
+
+    trace: list[ExecutionTraceEntry] = field(default_factory=list)
 
     @property
     def successful(self) -> bool:

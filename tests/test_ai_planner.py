@@ -5,6 +5,7 @@ import unittest
 from enums.handler_type import HandlerType
 from enums.operation_type import OperationType
 from infrastructure.ai.ai_planner import AIPlanner
+from exceptions.clarification_required_error import ClarificationRequiredError
 from models.ai_response import AIResponse
 from prompts.browser_prompt import BROWSER_PROMPT
 from prompts.examples_prompt import EXAMPLES_PROMPT
@@ -58,13 +59,36 @@ class AIPlannerTests(unittest.TestCase):
         self.assertEqual(plan.actions[1].parameters, {"key": "ENTER"})
 
     def test_create_plan_uses_composed_system_prompt(self) -> None:
-        service = _FakeAIService('{"actions": []}')
+        service = _FakeAIService(
+            '{"actions": [{"handler": "CLIPBOARD", "operation": "READ", "parameters": {}}]}'
+        )
 
         AIPlanner(service).create_plan("Do nothing")
 
         self.assertEqual(service.request.system_prompt, SYSTEM_PROMPT)
         self.assertEqual(service.request.temperature, 0)
         self.assertEqual(service.request.max_tokens, 500)
+
+    def test_malformed_ai_response_requests_clarification(self) -> None:
+        with self.assertRaises(ClarificationRequiredError):
+            AIPlanner(_FakeAIService("not valid json")).create_plan("do something")
+
+    def test_schema_invalid_ai_response_requests_clarification(self) -> None:
+        service = _FakeAIService(
+            '{"actions": [{"handler": "NEWS", "operation": "SEARCH", "parameters": {"topic": "AI"}}]}'
+        )
+
+        with self.assertRaises(ClarificationRequiredError):
+            AIPlanner(service).create_plan("find AI news")
+
+    def test_news_plan_uses_query_parameter(self) -> None:
+        service = _FakeAIService(
+            '{"actions": [{"handler": "NEWS", "operation": "SEARCH", "parameters": {"query": "AI"}}]}'
+        )
+
+        plan = AIPlanner(service).create_plan("find AI news")
+
+        self.assertEqual(plan.actions[0].parameters, {"query": "AI"})
 
     def test_system_prompt_includes_each_dedicated_component_once(self) -> None:
         for component in (

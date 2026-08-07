@@ -20,6 +20,7 @@ class BrowserPolicyManager:
     _LOCAL_PATH = re.compile(
         r"^(?:[a-zA-Z]:[\\/]|\\\\|/|~[\\/])"
     )
+    _DANGEROUS_SCHEMES = frozenset({"javascript", "data", "file"})
 
     def __init__(
         self,
@@ -72,6 +73,11 @@ class BrowserPolicyManager:
 
         return normalized
 
+    def authorize_redirect(self, url: str) -> str:
+        """Authorize the final URL reached after a navigation transition."""
+
+        return self.authorize_navigation(url)
+
     def normalize_url(self, url: str) -> str:
         """Return a canonical URL after validating its scheme and structure."""
 
@@ -85,6 +91,11 @@ class BrowserPolicyManager:
 
         parts = urlsplit(candidate)
         scheme = parts.scheme.lower()
+
+        if scheme in self._DANGEROUS_SCHEMES:
+            raise BrowserPolicyError(
+                f"Dangerous URL scheme '{scheme}' is never allowed."
+            )
 
         if scheme not in self._allowed_schemes:
             raise BrowserPolicyError(

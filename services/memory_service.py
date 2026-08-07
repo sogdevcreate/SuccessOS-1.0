@@ -48,3 +48,8 @@ class MemoryService(ABC):
         Remove a specific memory.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def list(self) -> list[MemoryRecord]:
+        """Return all stored memories."""
+        raise NotImplementedError

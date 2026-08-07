@@ -6,6 +6,9 @@ import json
 
 from enums.handler_type import HandlerType
 from enums.operation_type import OperationType
+from core.plan_validator import PlanValidator
+from exceptions.clarification_required_error import ClarificationRequiredError
+from exceptions.plan_validation_error import PlanValidationError
 from infrastructure.ai.browser_intent_classifier import (
     BrowserIntentClassifier,
 )
@@ -26,6 +29,7 @@ class AIPlanner(Planner):
     ) -> None:
         self._ai_service = ai_service
         self._browser_intent_classifier = BrowserIntentClassifier()
+        self._plan_validator = PlanValidator()
 
     def create_plan(
         self,
@@ -47,17 +51,49 @@ class AIPlanner(Planner):
             )
         )
 
-        data = json.loads(response.content)
+        return self._parse_plan(response.content)
+
+    def _parse_plan(self, content: str) -> ExecutionPlan:
+        """Parse and strictly validate an AI response before execution."""
+
+        try:
+            data = json.loads(content)
+        except (TypeError, json.JSONDecodeError) as ex:
+            raise ClarificationRequiredError() from ex
+
+        if not isinstance(data, dict) or set(data) != {"actions"}:
+            raise ClarificationRequiredError()
+
+        actions_data = data["actions"]
+
+        if not isinstance(actions_data, list) or not actions_data:
+            raise ClarificationRequiredError()
+
         plan = ExecutionPlan()
 
-        for item in data.get("actions", []):
-            plan.add(
-                Action(
-                    name=item["operation"],
-                    handler=HandlerType[item["handler"]],
-                    operation=OperationType[item["operation"]],
-                    parameters=item.get("parameters", {}),
+        try:
+            for item in actions_data:
+                if (
+                    not isinstance(item, dict)
+                    or set(item) != {"handler", "operation", "parameters"}
+                    or not isinstance(item["handler"], str)
+                    or not isinstance(item["operation"], str)
+                    or not isinstance(item["parameters"], dict)
+                ):
+                    raise ClarificationRequiredError()
+
+                plan.add(
+                    Action(
+                        name=item["operation"],
+                        handler=HandlerType[item["handler"]],
+                        operation=OperationType[item["operation"]],
+                        parameters=item["parameters"],
+                    )
                 )
-            )
+
+            self._plan_validator.validate(plan)
+
+        except (KeyError, PlanValidationError, ValueError) as ex:
+            raise ClarificationRequiredError() from ex
 
         return plan

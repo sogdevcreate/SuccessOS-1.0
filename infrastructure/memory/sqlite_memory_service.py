@@ -40,15 +40,50 @@ class SQLiteMemoryService(MemoryService):
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS memories (
-                key TEXT PRIMARY KEY,
                 category TEXT NOT NULL,
+                key TEXT NOT NULL,
                 value TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
-                metadata TEXT NOT NULL
+                metadata TEXT NOT NULL,
+                PRIMARY KEY (category, key)
             )
             """
         )
+
+        cursor.execute("PRAGMA table_info(memories)")
+        primary_key_columns = [
+            row["name"]
+            for row in sorted(cursor.fetchall(), key=lambda row: row["pk"])
+            if row["pk"]
+        ]
+
+        if primary_key_columns != ["category", "key"]:
+            cursor.execute(
+                """
+                CREATE TABLE memories_migrated (
+                    category TEXT NOT NULL,
+                    key TEXT NOT NULL,
+                    value TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    metadata TEXT NOT NULL,
+                    PRIMARY KEY (category, key)
+                )
+                """
+            )
+            cursor.execute(
+                """
+                INSERT INTO memories_migrated (
+                    category, key, value, created_at, updated_at, metadata
+                )
+                SELECT category, key, value, created_at, updated_at, metadata
+                FROM memories
+                """
+            )
+            cursor.execute("DROP TABLE memories")
+            cursor.execute("ALTER TABLE memories_migrated RENAME TO memories")
+            self._logger.info("Migrated memory schema to composite primary key.")
 
         self._database.connection.commit()
 
@@ -67,19 +102,23 @@ class SQLiteMemoryService(MemoryService):
 
             cursor.execute(
                 """
-                INSERT OR REPLACE INTO memories (
-                    key,
+                INSERT INTO memories (
                     category,
+                    key,
                     value,
                     created_at,
                     updated_at,
                     metadata
                 )
                 VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(category, key) DO UPDATE SET
+                    value = excluded.value,
+                    updated_at = excluded.updated_at,
+                    metadata = excluded.metadata
                 """,
                 (
-                    memory.key,
                     memory.category.value,
+                    memory.key,
                     json.dumps(memory.value),
                     memory.created_at.isoformat(),
                     memory.updated_at.isoformat(),
@@ -210,3 +249,32 @@ class SQLiteMemoryService(MemoryService):
                 f"Failed to delete memory '{key}': {ex}"
             )
             return False
+
+    def list(self) -> list[MemoryRecord]:
+        """Return all memories in stable category/key order."""
+
+        try:
+            cursor = self._database.connection.cursor()
+            cursor.execute(
+                """
+                SELECT key, category, value, created_at, updated_at, metadata
+                FROM memories
+                ORDER BY category, key
+                """
+            )
+
+            return [
+                MemoryRecord(
+                    category=MemoryCategory(row["category"]),
+                    key=row["key"],
+                    value=json.loads(row["value"]),
+                    created_at=datetime.fromisoformat(row["created_at"]),
+                    updated_at=datetime.fromisoformat(row["updated_at"]),
+                    metadata=json.loads(row["metadata"]),
+                )
+                for row in cursor.fetchall()
+            ]
+
+        except Exception as ex:
+            self._logger.error(f"Failed to list memories: {ex}")
+            return []

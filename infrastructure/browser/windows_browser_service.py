@@ -65,9 +65,7 @@ class WindowsBrowserService(BrowserService):
         Open a URL.
         """
 
-        driver = self._session.driver
-
-        driver.get(self._policy.authorize_navigation(url))
+        self._navigate(url)
 
         self._session.remember_current_tab()
 
@@ -85,7 +83,7 @@ class WindowsBrowserService(BrowserService):
             "tab",
         )
 
-        driver.get(self._policy.authorize_navigation(url))
+        self._navigate(url)
 
         self._session.remember_current_tab()
 
@@ -110,6 +108,7 @@ class WindowsBrowserService(BrowserService):
         driver = self._session.driver
         self._policy.authorize_navigation(driver.current_url)
         driver.refresh()
+        self._verify_current_url()
 
     def go_back(
         self,
@@ -119,6 +118,7 @@ class WindowsBrowserService(BrowserService):
         """
 
         self._session.driver.back()
+        self._verify_current_url()
 
     def go_forward(
         self,
@@ -128,6 +128,7 @@ class WindowsBrowserService(BrowserService):
         """
 
         self._session.driver.forward()
+        self._verify_current_url()
 
     #
     # Tabs
@@ -298,6 +299,7 @@ class WindowsBrowserService(BrowserService):
         self._youtube.search(
             query,
         )
+        self._verify_current_url()
 
         self._session.remember_current_tab()
 
@@ -313,6 +315,7 @@ class WindowsBrowserService(BrowserService):
         self._youtube.play(
             query,
         )
+        self._verify_current_url()
 
         self._session.remember_current_tab()
 
@@ -328,6 +331,7 @@ class WindowsBrowserService(BrowserService):
         self._youtube.open_video(
             video_id,
         )
+        self._verify_current_url()
 
         self._session.remember_current_tab()
 
@@ -343,6 +347,7 @@ class WindowsBrowserService(BrowserService):
         self._youtube.open_playlist(
             playlist_id,
         )
+        self._verify_current_url()
 
         self._session.remember_current_tab()
 
@@ -358,6 +363,7 @@ class WindowsBrowserService(BrowserService):
         self._youtube.open_channel(
             channel,
         )
+        self._verify_current_url()
 
         self._session.remember_current_tab()
 
@@ -368,32 +374,58 @@ class WindowsBrowserService(BrowserService):
     def studio_open(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.open_studio()
+        self._verify_current_url()
 
     def studio_dashboard(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.dashboard()
+        self._verify_current_url()
 
     def studio_content(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.content()
+        self._verify_current_url()
 
     def studio_analytics(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.analytics()
+        self._verify_current_url()
 
     def studio_comments(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.comments()
+        self._verify_current_url()
 
     def studio_copyright(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.copyright()
+        self._verify_current_url()
 
     def studio_monetization(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.monetization()
+        self._verify_current_url()
 
     def studio_settings(self) -> None:
         self._policy.authorize_navigation("https://studio.youtube.com/")
         self._studio.settings()
+        self._verify_current_url()
+
+    def _navigate(self, url: str) -> None:
+        """Navigate and validate the final URL after redirects."""
+
+        driver = self._session.driver
+        driver.get(self._policy.authorize_navigation(url))
+        self._verify_current_url()
+
+    def _verify_current_url(self) -> None:
+        """Reject a redirect or history target that violates browser policy."""
+
+        driver = self._session.driver
+
+        try:
+            self._policy.authorize_redirect(driver.current_url)
+        except Exception:
+            driver.get("about:blank")
+            raise
 

@@ -60,15 +60,26 @@ class BrowserPolicyManagerTests(unittest.TestCase):
                 with self.assertRaises(BrowserPolicyError):
                     self.manager.authorize_navigation(url)
 
-    def test_explicitly_allowed_non_web_scheme_is_accepted(self) -> None:
-        manager = BrowserPolicyManager(
-            allowed_schemes=("file",),
-        )
+    def test_dangerous_scheme_cannot_be_enabled_by_configuration(self) -> None:
+        for url, scheme in (
+            ("file:///C:/secret.txt", "file"),
+            ("javascript:alert(1)", "javascript"),
+            ("data:text/plain,secret", "data"),
+        ):
+            with self.subTest(scheme=scheme):
+                manager = BrowserPolicyManager(allowed_schemes=(scheme,))
+                with self.assertRaises(BrowserPolicyError):
+                    manager.authorize_navigation(url)
+
+    def test_redirect_uses_same_policy_as_direct_navigation(self) -> None:
+        manager = BrowserPolicyManager(allowed_domains=("example.com",))
 
         self.assertEqual(
-            manager.authorize_navigation("file:///C:/approved.txt"),
-            "file:///C:/approved.txt",
+            manager.authorize_redirect("https://www.example.com/final"),
+            "https://www.example.com/final",
         )
+        with self.assertRaises(BrowserPolicyError):
+            manager.authorize_redirect("https://attacker.test/redirect")
 
     def test_upload_requires_confirmation(self) -> None:
         with self.assertRaises(BrowserPolicyError):

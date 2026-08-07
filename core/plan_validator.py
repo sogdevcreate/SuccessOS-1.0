@@ -184,7 +184,7 @@ class PlanValidator:
         # News
         #
         (HandlerType.NEWS, OperationType.SEARCH): (
-            "topic",
+            "query",
         ),
 
         #
@@ -292,6 +292,12 @@ class PlanValidator:
             ),
             (),
         )
+
+        if (handler, operation) not in self._REQUIRED_PARAMETERS:
+            raise PlanValidationError(
+                f"Action {index} does not support "
+                f"'{handler.value}/{operation.value}'."
+            )
 
         for parameter in required:
             if parameter not in parameters:

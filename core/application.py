@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from config.service_container import ServiceContainer
 
+from exceptions.clarification_required_error import ClarificationRequiredError
+
 
 class Application:
     """
@@ -92,6 +94,10 @@ class Application:
                     result = self.execution_engine.execute(plan)
 
                     print(result.message)
+
+                except ClarificationRequiredError as ex:
+                    self._logger.warning(str(ex))
+                    print(f"\n{ex}\n")
 
                 except Exception as ex:
                     self._logger.exception(
