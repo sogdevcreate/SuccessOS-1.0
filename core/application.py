@@ -6,7 +6,10 @@ Coordinates the lifecycle of SuccessOS.
 
 from __future__ import annotations
 
-from config.service_container import ServiceContainer
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from config.service_container import ServiceContainer
 
 
 class Application:
@@ -16,8 +19,16 @@ class Application:
     Owns the application lifecycle.
     """
 
-    def __init__(self) -> None:
-        self._container = ServiceContainer()
+    def __init__(
+        self,
+        container: "ServiceContainer | None" = None,
+    ) -> None:
+        if container is None:
+            from config.service_container import ServiceContainer
+
+            container = ServiceContainer()
+
+        self._container = container
         self._logger = self._container.logging_service
 
     @property

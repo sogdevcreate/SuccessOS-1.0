@@ -4,10 +4,10 @@ Context builder.
 
 from __future__ import annotations
 
-from interfaces.memory_service import MemoryService
-from interfaces.profile_service import ProfileService
-from interfaces.system_service import SystemService
 from models.context import Context
+from services.memory_service import MemoryService
+from services.profile_service import ProfileService
+from services.system_service import SystemService
 
 
 class ContextBuilder:
