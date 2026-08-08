@@ -1,12 +1,16 @@
-# SuccessOS AI YouTube Studio architecture
+# SuccessOS AI Film Studio architecture
 
 ## Package structure
 
-`studio.models` contains the serializable production aggregate and its typed artifacts. `studio.enums` defines project, quality, media, asset, pipeline, and per-stage state. `studio.interfaces` contains provider-facing abstract contracts. `studio.services` owns persistence, versioning, quality evaluation, and pipeline state transitions. `studio.pipeline` coordinates injected stage executors.
+`studio.models` contains the serializable production aggregate, the film-wide `ProductionProfile`, the `DirectorsBible`, and typed production artifacts. `studio.enums` defines project, quality, media, asset, pipeline, and per-stage state. `studio.interfaces` contains provider-facing abstract contracts. `studio.services` owns persistence, versioning, quality evaluation, and pipeline state transitions. `studio.pipeline` coordinates injected stage executors.
 
 ## StudioProject data flow
 
-`StudioProject` is the single source of truth for one production. A stage executor receives a `PipelineContext` containing that project and reports the outcome through a typed `StageResult`. Executors do not receive, or mutate, another executor's separate domain object. The pipeline persists the aggregate after state transitions and captures a version after each successful stage.
+`StudioProject` is the single source of truth for one film production. Every project owns exactly one `ProductionProfile` and one `DirectorsBible`. A stage executor receives a `PipelineContext` containing that project and exposes both creative artifacts as typed context properties. It reports the outcome through a typed `StageResult`. Executors do not receive, or mutate, another executor's separate domain object. The pipeline persists the aggregate after state transitions and captures a version after each successful stage.
+
+## Film direction
+
+`ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.
 
 ## Pipeline lifecycle
 
@@ -26,4 +30,4 @@ Creator-facing interfaces produce typed stage results. A `Reviewer` returns a `Q
 
 ## Future extensions
 
-Implement an interface for an AI, image, video, audio, publishing, or analytics provider and register a small adapter as the relevant pipeline executor. The adapter may update the shared `StudioProject` only for its own stage's resulting domain fields and must return an honest `StageResult`. Repository implementations may be replaced with a durable database repository while retaining `ProjectRepository`, `VersionManager`, and `StudioPipeline` construction boundaries.
+Implement an interface for an AI, image, video, audio, publishing, or analytics provider and register a small adapter as the relevant pipeline executor. The adapter receives the shared project, `ProductionProfile`, and `DirectorsBible` through `PipelineContext`; it may update `StudioProject` only for its own stage's resulting domain fields and must return an honest `StageResult`. Repository implementations may be replaced with a durable database repository while retaining `ProjectRepository`, `VersionManager`, and `StudioPipeline` construction boundaries.

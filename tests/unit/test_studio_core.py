@@ -1,7 +1,7 @@
 import unittest
 
 from studio.enums import AssetType, MediaType, PipelineStage, ProjectStatus, QualityStatus, StageStatus
-from studio.models import Asset, ProjectMetadata, QualityReport, QualityScore, Research, StudioProject
+from studio.models import Asset, DirectorsBible, ProductionProfile, ProjectMetadata, QualityReport, QualityScore, Research, StudioProject
 from studio.pipeline import StageResult, StudioPipeline
 from studio.services import InMemoryProjectRepository, PipelineStateManager, QualityManager, VersionManager
 
@@ -30,6 +30,24 @@ class StudioProjectTests(unittest.TestCase):
         data = project.to_dict()
         self.assertEqual(data["status"], "draft")
         self.assertEqual(data["current_pipeline_stage"], "idea")
+
+    def test_film_profile_and_directors_bible_round_trip(self) -> None:
+        project = self.make_project()
+        project.production_profile = ProductionProfile(target_platform="cinema", genre="drama", realism_level="photoreal", visual_style="noir", rendering_quality="4k", camera_style="handheld", lighting_style="low key", color_profile="teal-orange", motion_style="natural", voice_style="warm", music_style="orchestral", audience="adults", duration=120, language="en")
+        project.directors_bible = DirectorsBible(story_vision="A quiet reconciliation.", visual_rules=["Use negative space."], camera_rules=["Avoid dutch angles."], quality_targets={"continuity": 9.0}, continuity_rules=["Keep the coat blue."])
+        restored = StudioProject.from_dict(project.to_dict())
+        self.assertEqual(restored.production_profile.target_platform, "cinema")
+        self.assertEqual(restored.production_profile.duration, 120)
+        self.assertEqual(restored.directors_bible.quality_targets, {"continuity": 9.0})
+        self.assertEqual(restored.directors_bible.continuity_rules, ["Keep the coat blue."])
+
+    def test_legacy_project_data_receives_film_direction_defaults(self) -> None:
+        data = self.make_project().to_dict()
+        data.pop("production_profile")
+        data.pop("directors_bible")
+        restored = StudioProject.from_dict(data)
+        self.assertEqual(restored.production_profile.language, "en")
+        self.assertEqual(restored.directors_bible.story_vision, "")
 
 
 class VersionManagerTests(unittest.TestCase):
@@ -123,6 +141,21 @@ class StudioPipelineTests(unittest.TestCase):
         pipeline = self.pipeline({})
         self.assertIsInstance(pipeline, StudioPipeline)
         self.assertIs(self.repository.get(self.project.identifier), None)
+
+    def test_stage_context_passes_shared_film_direction(self) -> None:
+        self.project.production_profile = ProductionProfile(genre="science fiction", duration=90)
+        self.project.directors_bible = DirectorsBible(story_vision="Wonder before danger.")
+        received = []
+
+        def executor(context):
+            received.append((context.project, context.production_profile, context.directors_bible))
+            return StageResult(PipelineStage.IDEA, StageStatus.SUCCEEDED)
+
+        self.pipeline({PipelineStage.IDEA: executor}).run_stage(self.project)
+        self.assertEqual(len(received), 1)
+        self.assertIs(received[0][0], self.project)
+        self.assertIs(received[0][1], self.project.production_profile)
+        self.assertIs(received[0][2], self.project.directors_bible)
 
 
 if __name__ == "__main__":

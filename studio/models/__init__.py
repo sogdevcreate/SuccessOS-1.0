@@ -35,7 +35,9 @@ from studio.models.animation import Animation
 from studio.models.asset import Asset
 from studio.models.audio import Audio
 from studio.models.character import Character
+from studio.models.directors_bible import DirectorsBible
 from studio.models.production_settings import ProductionSettings
+from studio.models.production_profile import ProductionProfile
 from studio.models.project_metadata import ProjectMetadata
 from studio.models.project_version import ProjectVersion
 from studio.models.publishing import PublishingMetadata
@@ -49,7 +51,7 @@ from studio.models.video import Video
 from studio.models.studio_project import StudioProject
 
 __all__ = [
-    "Analytics", "Animation", "Asset", "Audio", "Character", "ProductionSettings",
+    "Analytics", "Animation", "Asset", "Audio", "Character", "DirectorsBible", "ProductionProfile", "ProductionSettings",
     "ProjectMetadata", "ProjectVersion", "PublishingMetadata", "QualityReport",
     "QualityScore", "Research", "Scene", "Script", "Storyboard", "StoryboardFrame",
     "StudioProject", "Video", "deserialize_datetime", "serialize", "utc_now",
