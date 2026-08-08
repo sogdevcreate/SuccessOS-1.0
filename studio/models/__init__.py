@@ -49,10 +49,11 @@ from studio.models.script import Script
 from studio.models.storyboard import Storyboard, StoryboardFrame
 from studio.models.video import Video
 from studio.models.studio_project import StudioProject
+from studio.screenwriting.screenplay import Screenplay
 
 __all__ = [
     "Analytics", "Animation", "Asset", "Audio", "Character", "DirectorsBible", "ProductionProfile", "ProductionSettings",
     "ProjectMetadata", "ProjectVersion", "PublishingMetadata", "QualityReport",
     "QualityScore", "Research", "Scene", "Script", "Storyboard", "StoryboardFrame",
-    "StudioProject", "Video", "deserialize_datetime", "serialize", "utc_now",
+    "Screenplay", "StudioProject", "Video", "deserialize_datetime", "serialize", "utc_now",
 ]
