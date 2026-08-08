@@ -41,6 +41,8 @@ class StudioPipeline:
             return StageResult.failed(target, "Asset generation requires completed scene planning")
         if target is PipelineStage.ANIMATION and project.stage_statuses.get(PipelineStage.ASSETS) is not StageStatus.SUCCEEDED:
             return StageResult.failed(target, "Animation requires generated assets that passed their quality gate")
+        if target in {PipelineStage.VOICE, PipelineStage.MUSIC_SFX} and project.stage_statuses.get(PipelineStage.ANIMATION) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Voice and audio stages require approved animated shots")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)
