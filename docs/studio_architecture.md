@@ -16,6 +16,8 @@ The Storyboard stage stores `CinematicStoryboard`, a photorealistic-cinematic sh
 
 The Character/Environment Continuity stage stores typed identity, wardrobe, environment, prop, and snapshot data in `ContinuityRegistry`. Its visual identity locks are provider-neutral inputs for future generation engines, while screenplay and storyboard remain read-only. It gates Scene Planning; Assets additionally require completed Scene Planning.
 
+Scene Planning stores provider-neutral `ScenePlan` and `AssetSpecification` records. These bind the approved screenplay, storyboard, and continuity state into explicit photorealistic production instructions; future providers must consume specifications and generation instructions rather than bypass them.
+
 ## Film direction
 
 `ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.
