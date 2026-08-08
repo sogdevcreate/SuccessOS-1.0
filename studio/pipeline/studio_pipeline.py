@@ -45,6 +45,12 @@ class StudioPipeline:
             return StageResult.failed(target, "Voice and audio stages require approved animated shots")
         if target is PipelineStage.VIDEO_EDIT and (project.stage_statuses.get(PipelineStage.VOICE) is not StageStatus.SUCCEEDED or project.stage_statuses.get(PipelineStage.MUSIC_SFX) is not StageStatus.SUCCEEDED):
             return StageResult.failed(target, "Video editing requires approved voice and music/sound production")
+        if target is PipelineStage.COLOR_GRADING and project.stage_statuses.get(PipelineStage.VIDEO_EDIT) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Color grading requires approved video editing")
+        if target is PipelineStage.RENDERING and project.stage_statuses.get(PipelineStage.COLOR_GRADING) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Rendering requires approved color grading")
+        if target is PipelineStage.PUBLISH and project.stage_statuses.get(PipelineStage.RENDERING) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Publishing requires an approved final render")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)

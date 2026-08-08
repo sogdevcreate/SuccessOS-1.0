@@ -6,4 +6,4 @@ class ColorQualityReviewer:
     def review(self,grade,project):
         profile=project.production_profile;bible=project.directors_bible
         valid=bool(grade.shot_grades and grade.profile.look_profile and profile.realism_level and bible.visual_rules and all(shot.saturation.skin_tone_protection for shot in grade.shot_grades))
-        score=10. if valid else 0.;report=QualityReport(PipelineStage.VIDEO_EDIT,[QualityScore(item,score) for item in self.CRITERIA],project.production_settings.quality_threshold);report.evaluate();return report
+        score=10. if valid else 0.;report=QualityReport(PipelineStage.COLOR_GRADING,[QualityScore(item,score) for item in self.CRITERIA],project.production_settings.quality_threshold);report.evaluate();return report

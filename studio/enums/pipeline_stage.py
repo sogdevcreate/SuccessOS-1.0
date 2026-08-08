@@ -13,6 +13,8 @@ class PipelineStage(str, Enum):
     VOICE = "voice"
     MUSIC_SFX = "music_sfx"
     VIDEO_EDIT = "video_edit"
+    COLOR_GRADING = "color_grading"
+    RENDERING = "rendering"
     THUMBNAIL = "thumbnail"
     METADATA_SEO = "metadata_seo"
     PUBLISH = "publish"
