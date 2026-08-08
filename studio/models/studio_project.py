@@ -19,6 +19,7 @@ from studio.models.scene import Scene
 from studio.models.script import Script
 from studio.models.storyboard import Storyboard
 from studio.models.video import Video
+from studio.research.research_report import ResearchReport
 
 
 @dataclass
@@ -29,6 +30,7 @@ class StudioProject:
     production_profile: ProductionProfile = field(default_factory=ProductionProfile)
     directors_bible: DirectorsBible = field(default_factory=DirectorsBible)
     research: Research | None = None
+    research_report: ResearchReport | None = None
     script: Script | None = None
     storyboard: Storyboard | None = None
     characters: list[Character] = field(default_factory=list)
@@ -53,7 +55,7 @@ class StudioProject:
         data: dict[str, object] = {
             "identifier": self.identifier, "metadata": self.metadata.to_dict(), "production_settings": self.production_settings.to_dict(),
             "production_profile": self.production_profile.to_dict(), "directors_bible": self.directors_bible.to_dict(),
-            "research": self.research.to_dict() if self.research else None, "script": self.script.to_dict() if self.script else None,
+            "research": self.research.to_dict() if self.research else None, "research_report": self.research_report.to_dict() if self.research_report else None, "script": self.script.to_dict() if self.script else None,
             "storyboard": self.storyboard.to_dict() if self.storyboard else None, "characters": [item.to_dict() for item in self.characters],
             "scenes": [item.to_dict() for item in self.scenes], "assets": [item.to_dict() for item in self.assets],
             "animations": [item.to_dict() for item in self.animations], "audio": [item.to_dict() for item in self.audio],
@@ -69,5 +71,5 @@ class StudioProject:
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> "StudioProject":
         optional = lambda key, model: model.from_dict(data[key]) if data.get(key) else None
-        project = cls(identifier=str(data["identifier"]), metadata=ProjectMetadata.from_dict(data["metadata"]), production_settings=ProductionSettings.from_dict(data.get("production_settings", {})), production_profile=ProductionProfile.from_dict(data.get("production_profile", {})), directors_bible=DirectorsBible.from_dict(data.get("directors_bible", {})), research=optional("research", Research), script=optional("script", Script), storyboard=optional("storyboard", Storyboard), characters=[Character.from_dict(item) for item in data.get("characters", [])], scenes=[Scene.from_dict(item) for item in data.get("scenes", [])], assets=[Asset.from_dict(item) for item in data.get("assets", [])], animations=[Animation.from_dict(item) for item in data.get("animations", [])], audio=[Audio.from_dict(item) for item in data.get("audio", [])], video=optional("video", Video), publishing_metadata=PublishingMetadata.from_dict(data.get("publishing_metadata", {})), analytics=Analytics.from_dict(data.get("analytics", {})), quality_reports=[QualityReport.from_dict(item) for item in data.get("quality_reports", [])], version_history=[ProjectVersion.from_dict(item) for item in data.get("version_history", [])], current_pipeline_stage=PipelineStage(str(data.get("current_pipeline_stage", PipelineStage.IDEA.value))), status=ProjectStatus(str(data.get("status", ProjectStatus.DRAFT.value))), stage_statuses={PipelineStage(key): StageStatus(value) for key, value in data.get("stage_statuses", {}).items()})
+        project = cls(identifier=str(data["identifier"]), metadata=ProjectMetadata.from_dict(data["metadata"]), production_settings=ProductionSettings.from_dict(data.get("production_settings", {})), production_profile=ProductionProfile.from_dict(data.get("production_profile", {})), directors_bible=DirectorsBible.from_dict(data.get("directors_bible", {})), research=optional("research", Research), research_report=optional("research_report", ResearchReport), script=optional("script", Script), storyboard=optional("storyboard", Storyboard), characters=[Character.from_dict(item) for item in data.get("characters", [])], scenes=[Scene.from_dict(item) for item in data.get("scenes", [])], assets=[Asset.from_dict(item) for item in data.get("assets", [])], animations=[Animation.from_dict(item) for item in data.get("animations", [])], audio=[Audio.from_dict(item) for item in data.get("audio", [])], video=optional("video", Video), publishing_metadata=PublishingMetadata.from_dict(data.get("publishing_metadata", {})), analytics=Analytics.from_dict(data.get("analytics", {})), quality_reports=[QualityReport.from_dict(item) for item in data.get("quality_reports", [])], version_history=[ProjectVersion.from_dict(item) for item in data.get("version_history", [])], current_pipeline_stage=PipelineStage(str(data.get("current_pipeline_stage", PipelineStage.IDEA.value))), status=ProjectStatus(str(data.get("status", ProjectStatus.DRAFT.value))), stage_statuses={PipelineStage(key): StageStatus(value) for key, value in data.get("stage_statuses", {}).items()})
         return project

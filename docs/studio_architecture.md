@@ -8,13 +8,15 @@
 
 `StudioProject` is the single source of truth for one film production. Every project owns exactly one `ProductionProfile` and one `DirectorsBible`. A stage executor receives a `PipelineContext` containing that project and exposes both creative artifacts as typed context properties. It reports the outcome through a typed `StageResult`. Executors do not receive, or mutate, another executor's separate domain object. The pipeline persists the aggregate after state transitions and captures a version after each successful stage.
 
+The research stage stores a typed `ResearchReport` on the same aggregate. It keeps source acquisition outside the Studio pipeline while providing evidence validation, ranking, contradiction handling, cinematic research opportunities, and a dedicated quality review before Script can proceed.
+
 ## Film direction
 
 `ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.
 
 ## Pipeline lifecycle
 
-The fixed order is Idea, Research, Script, Storyboard, Characters, Scene Planning, Assets, Animation, Voice, Music/SFX, Video Edit, Thumbnail, Metadata/SEO, Publish, and Analytics. The pipeline can start at a selected stage, pause, resume, cancel, retry the failed stage, or mark a documented optional stage as skipped. It requires an explicitly registered executor; an unregistered stage fails rather than claiming production work occurred. A supplied quality report must pass before the pipeline advances.
+The fixed order is Idea, Research, Script, Storyboard, Characters, Scene Planning, Assets, Animation, Voice, Music/SFX, Video Edit, Thumbnail, Metadata/SEO, Publish, and Analytics. The pipeline can start at a selected stage, pause, resume, cancel, retry the failed stage, or mark a documented optional stage as skipped. It requires an explicitly registered executor; an unregistered stage fails rather than claiming production work occurred. A supplied quality report must pass before the pipeline advances. Script also explicitly requires Research to have passed its quality gate, including when a caller attempts to resume directly at Script.
 
 ## Versioning
 

@@ -29,6 +29,8 @@ class StudioPipeline:
             return StageResult.failed(target, "Pipeline is cancelled")
         if project.status is ProjectStatus.PAUSED:
             return StageResult(stage=target, status=StageStatus.PAUSED, message="Pipeline is paused")
+        if target is PipelineStage.SCRIPT and project.stage_statuses.get(PipelineStage.RESEARCH) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Script stage requires research that passed its quality gate")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)
