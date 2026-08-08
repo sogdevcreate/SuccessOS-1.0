@@ -1,0 +1,7 @@
+from dataclasses import dataclass,field
+@dataclass
+class PublicationMetadata:
+ canonical_title:str;description:str;language:str;category:str="";alternate_titles:list[str]=field(default_factory=list);short_description:str="";tags:list[str]=field(default_factory=list);keywords:list[str]=field(default_factory=list);credits:list[str]=field(default_factory=list);attribution_notes:list[str]=field(default_factory=list);copyright_information:str="";licensing_information:str="";disclosure_information:str=""
+ def to_dict(self): return {"canonical_title":self.canonical_title,"description":self.description,"language":self.language,"category":self.category,"alternate_titles":list(self.alternate_titles),"short_description":self.short_description,"tags":list(self.tags),"keywords":list(self.keywords),"credits":list(self.credits),"attribution_notes":list(self.attribution_notes),"copyright_information":self.copyright_information,"licensing_information":self.licensing_information,"disclosure_information":self.disclosure_information}
+ @classmethod
+ def from_dict(cls,data): return cls(str(data["canonical_title"]),str(data["description"]),str(data["language"]),str(data.get("category","")),list(data.get("alternate_titles",[])),str(data.get("short_description","")),list(data.get("tags",[])),list(data.get("keywords",[])),list(data.get("credits",[])),list(data.get("attribution_notes",[])),str(data.get("copyright_information","")),str(data.get("licensing_information","")),str(data.get("disclosure_information","")))
