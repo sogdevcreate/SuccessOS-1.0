@@ -1,0 +1,1 @@
+from studio.audio_production.voice_provider_registry import VoiceProviderRegistry as MusicProviderRegistry

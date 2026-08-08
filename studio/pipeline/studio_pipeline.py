@@ -43,6 +43,8 @@ class StudioPipeline:
             return StageResult.failed(target, "Animation requires generated assets that passed their quality gate")
         if target in {PipelineStage.VOICE, PipelineStage.MUSIC_SFX} and project.stage_statuses.get(PipelineStage.ANIMATION) is not StageStatus.SUCCEEDED:
             return StageResult.failed(target, "Voice and audio stages require approved animated shots")
+        if target is PipelineStage.VIDEO_EDIT and (project.stage_statuses.get(PipelineStage.VOICE) is not StageStatus.SUCCEEDED or project.stage_statuses.get(PipelineStage.MUSIC_SFX) is not StageStatus.SUCCEEDED):
+            return StageResult.failed(target, "Video editing requires approved voice and music/sound production")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)
