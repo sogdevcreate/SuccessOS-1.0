@@ -12,13 +12,15 @@ The research stage stores a typed `ResearchReport` on the same aggregate. It kee
 
 The Script stage stores a typed `Screenplay` on the aggregate and treats `ResearchReport` as read-only evidence. It validates scene-level fact traceability, unsupported claims, disputed claims, continuity, ProductionProfile alignment, and Director's Bible constraints before the screenplay quality gate permits Storyboard.
 
+The Storyboard stage stores `CinematicStoryboard`, a photorealistic-cinematic shot plan that keeps the screenplay read-only. It validates scene traceability, professional camera/lens/lighting plans, visual continuity, and 180-degree-rule metadata before gating Characters, Scene Planning, and Assets.
+
 ## Film direction
 
 `ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.
 
 ## Pipeline lifecycle
 
-The fixed order is Idea, Research, Script, Storyboard, Characters, Scene Planning, Assets, Animation, Voice, Music/SFX, Video Edit, Thumbnail, Metadata/SEO, Publish, and Analytics. The pipeline can start at a selected stage, pause, resume, cancel, retry the failed stage, or mark a documented optional stage as skipped. It requires an explicitly registered executor; an unregistered stage fails rather than claiming production work occurred. A supplied quality report must pass before the pipeline advances. Script explicitly requires Research to have passed its quality gate, and Storyboard explicitly requires Script to have passed its quality gate, including when a caller attempts to resume directly at either stage.
+The fixed order is Idea, Research, Script, Storyboard, Characters, Scene Planning, Assets, Animation, Voice, Music/SFX, Video Edit, Thumbnail, Metadata/SEO, Publish, and Analytics. The pipeline can start at a selected stage, pause, resume, cancel, retry the failed stage, or mark a documented optional stage as skipped. It requires an explicitly registered executor; an unregistered stage fails rather than claiming production work occurred. A supplied quality report must pass before the pipeline advances. Script explicitly requires Research, Storyboard requires Script, and Characters, Scene Planning, and Assets require Storyboard to have passed their quality gates, including direct-resume attempts.
 
 ## Versioning
 
