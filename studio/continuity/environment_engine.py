@@ -1,0 +1,3 @@
+from studio.continuity.character_engine import CharacterEnvironmentContinuityEngine
+
+EnvironmentEngine = CharacterEnvironmentContinuityEngine

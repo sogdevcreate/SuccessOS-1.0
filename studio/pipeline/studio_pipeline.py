@@ -35,6 +35,10 @@ class StudioPipeline:
             return StageResult.failed(target, "Storyboard stage requires a screenplay that passed its quality gate")
         if target in {PipelineStage.CHARACTERS, PipelineStage.SCENE_PLANNING, PipelineStage.ASSETS} and project.stage_statuses.get(PipelineStage.STORYBOARD) is not StageStatus.SUCCEEDED:
             return StageResult.failed(target, "This production stage requires a storyboard that passed its quality gate")
+        if target in {PipelineStage.SCENE_PLANNING, PipelineStage.ASSETS} and project.stage_statuses.get(PipelineStage.CHARACTERS) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "This production stage requires character and environment continuity that passed its quality gate")
+        if target is PipelineStage.ASSETS and project.stage_statuses.get(PipelineStage.SCENE_PLANNING) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Asset generation requires completed scene planning")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)
