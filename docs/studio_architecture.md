@@ -18,6 +18,8 @@ The Character/Environment Continuity stage stores typed identity, wardrobe, envi
 
 Scene Planning stores provider-neutral `ScenePlan` and `AssetSpecification` records. These bind the approved screenplay, storyboard, and continuity state into explicit photorealistic production instructions; future providers must consume specifications and generation instructions rather than bypass them.
 
+Asset Generation stores provider-ready requests, jobs, manifests, generated-asset provenance, and quality decisions. It selects only registered providers that satisfy hard specifications, never claims media exists without a provider result, and gates Animation on accepted assets.
+
 ## Film direction
 
 `ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.
