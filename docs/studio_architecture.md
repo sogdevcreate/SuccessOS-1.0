@@ -24,6 +24,8 @@ Animation stores provider-neutral shot requests, performance plans, temporal con
 
 Audio Production models voice acting, score, sound design, timelines, and mixes as provider-neutral production state. It gates Video Editing on approved voice and music/sound stages.
 
+Video Editing stores a typed edit project with ordered video/audio tracks, edit decisions, synchronization, transitions, subtitles, and provenance. It does not render media; its quality gate must pass before later color-grading work is introduced.
+
 ## Film direction
 
 `ProductionProfile` expresses the production's target platform, genre, realism level, visual and rendering styles, camera, lighting, color, motion, voice, music, audience, duration, and language. `DirectorsBible` holds the story vision and rules for visuals, characters, camera, lighting, pacing, editing, emotion, quality, and continuity. Both are serialized and versioned with the project, so all stages operate against the same creative direction.

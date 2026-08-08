@@ -32,6 +32,7 @@ from studio.generation.generation_request import GenerationRequest
 from studio.generation.generated_asset import GeneratedAsset
 from studio.animation.animation_request import AnimationRequest
 from studio.animation.shot_animation import ShotAnimation
+from studio.post_production.edit_project import EditProject
 
 
 @dataclass
@@ -56,6 +57,7 @@ class StudioProject:
     generated_assets: list[GeneratedAsset] = field(default_factory=list)
     animation_requests: list[AnimationRequest] = field(default_factory=list)
     shot_animations: list[ShotAnimation] = field(default_factory=list)
+    edit_project: EditProject | None = None
     storyboard: Storyboard | None = None
     characters: list[Character] = field(default_factory=list)
     scenes: list[Scene] = field(default_factory=list)
@@ -79,7 +81,7 @@ class StudioProject:
         data: dict[str, object] = {
             "identifier": self.identifier, "metadata": self.metadata.to_dict(), "production_settings": self.production_settings.to_dict(),
             "production_profile": self.production_profile.to_dict(), "directors_bible": self.directors_bible.to_dict(),
-            "research": self.research.to_dict() if self.research else None, "research_report": self.research_report.to_dict() if self.research_report else None, "script": self.script.to_dict() if self.script else None, "screenplay": self.screenplay.to_dict() if self.screenplay else None, "cinematic_storyboard": self.cinematic_storyboard.to_dict() if self.cinematic_storyboard else None, "character_profiles": [item.to_dict() for item in self.character_profiles], "environment_profiles": [item.to_dict() for item in self.environment_profiles], "prop_profiles": [item.to_dict() for item in self.prop_profiles], "continuity_registry": self.continuity_registry.to_dict() if self.continuity_registry else None, "scene_plans": [item.to_dict() for item in self.scene_plans], "asset_specifications": [item.to_dict() for item in self.asset_specifications], "generation_requests": [item.to_dict() for item in self.generation_requests], "generated_assets": [item.to_dict() for item in self.generated_assets], "animation_requests": [item.to_dict() for item in self.animation_requests], "shot_animations": [item.to_dict() for item in self.shot_animations],
+            "research": self.research.to_dict() if self.research else None, "research_report": self.research_report.to_dict() if self.research_report else None, "script": self.script.to_dict() if self.script else None, "screenplay": self.screenplay.to_dict() if self.screenplay else None, "cinematic_storyboard": self.cinematic_storyboard.to_dict() if self.cinematic_storyboard else None, "character_profiles": [item.to_dict() for item in self.character_profiles], "environment_profiles": [item.to_dict() for item in self.environment_profiles], "prop_profiles": [item.to_dict() for item in self.prop_profiles], "continuity_registry": self.continuity_registry.to_dict() if self.continuity_registry else None, "scene_plans": [item.to_dict() for item in self.scene_plans], "asset_specifications": [item.to_dict() for item in self.asset_specifications], "generation_requests": [item.to_dict() for item in self.generation_requests], "generated_assets": [item.to_dict() for item in self.generated_assets], "animation_requests": [item.to_dict() for item in self.animation_requests], "shot_animations": [item.to_dict() for item in self.shot_animations], "edit_project": self.edit_project.to_dict() if self.edit_project else None,
             "storyboard": self.storyboard.to_dict() if self.storyboard else None, "characters": [item.to_dict() for item in self.characters],
             "scenes": [item.to_dict() for item in self.scenes], "assets": [item.to_dict() for item in self.assets],
             "animations": [item.to_dict() for item in self.animations], "audio": [item.to_dict() for item in self.audio],
