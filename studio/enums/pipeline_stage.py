@@ -19,3 +19,4 @@ class PipelineStage(str, Enum):
     METADATA_SEO = "metadata_seo"
     PUBLISH = "publish"
     ANALYTICS = "analytics"
+    LEARNING = "learning"

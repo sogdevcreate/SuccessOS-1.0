@@ -53,3 +53,6 @@ Creator-facing interfaces produce typed stage results. A `Reviewer` returns a `Q
 ## Future extensions
 
 Implement an interface for an AI, image, video, audio, publishing, or analytics provider and register a small adapter as the relevant pipeline executor. The adapter receives the shared project, `ProductionProfile`, and `DirectorsBible` through `PipelineContext`; it may update `StudioProject` only for its own stage's resulting domain fields and must return an honest `StageResult`. Repository implementations may be replaced with a durable database repository while retaining `ProjectRepository`, `VersionManager`, and `StudioPipeline` construction boundaries.
+## Analytics and learning
+
+After publishing, the project may collect aggregate, provider-neutral analytics and derive inspectable learning reports. Recommendations remain proposals until Creator → Reviewer → Director approval creates a reversible, scoped optimization policy. The system cannot modify code, prompts, policies, or production rules automatically.

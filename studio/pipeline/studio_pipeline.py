@@ -51,10 +51,15 @@ class StudioPipeline:
             return StageResult.failed(target, "Rendering requires approved color grading")
         if target is PipelineStage.PUBLISH and project.stage_statuses.get(PipelineStage.RENDERING) is not StageStatus.SUCCEEDED:
             return StageResult.failed(target, "Publishing requires an approved final render")
+        if target is PipelineStage.ANALYTICS and project.stage_statuses.get(PipelineStage.PUBLISH) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Analytics requires completed publication")
+        if target is PipelineStage.LEARNING and project.stage_statuses.get(PipelineStage.ANALYTICS) is not StageStatus.SUCCEEDED:
+            return StageResult.failed(target, "Learning requires completed analytics")
         executor = self._executors.get(target)
         if executor is None:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED)
-            project.status = ProjectStatus.FAILED
+            if target not in {PipelineStage.ANALYTICS, PipelineStage.LEARNING}:
+                project.status = ProjectStatus.FAILED
             self._repository.save(project)
             return StageResult.failed(target, f"No executor is registered for stage '{target.value}'")
         project.status = ProjectStatus.ACTIVE
@@ -65,7 +70,7 @@ class StudioPipeline:
             result = StageResult.failed(target, "Executor returned a result for a different stage")
         if result.status is not StageStatus.SUCCEEDED:
             self._state_manager.mark_stage(project, target, StageStatus.FAILED if result.status is not StageStatus.SKIPPED else StageStatus.SKIPPED)
-            if result.status is not StageStatus.SKIPPED:
+            if result.status is not StageStatus.SKIPPED and target not in {PipelineStage.ANALYTICS, PipelineStage.LEARNING}:
                 project.status = ProjectStatus.FAILED
             self._repository.save(project)
             return result
